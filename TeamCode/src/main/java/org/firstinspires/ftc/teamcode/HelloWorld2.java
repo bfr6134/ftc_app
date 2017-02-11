@@ -5,4 +5,5 @@ package org.firstinspires.ftc.teamcode;
  */
 public class HelloWorld2 {
     // Serena is dumb
+    // She says a chair is weird
 }
