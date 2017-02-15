@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.iowaprograms;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
  * Created by jimly2024 on 2/8/2017.
  */
 @Autonomous (name = "Blue Alliance [] Auto", group = "Autonomous")
-public class BlueAuton extends AutonBase {
+public class BlueAuton extends IowaAutoBase {
 
     @Override
     public void setAuton() {

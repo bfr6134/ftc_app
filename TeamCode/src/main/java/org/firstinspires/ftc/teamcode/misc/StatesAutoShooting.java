@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.misc;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.util.Range;
 /*
  * Created by the BFR Coderz on 11/26/2016.
  */
-public class StatesAutoBlueBase extends LinearOpMode {
+public class StatesAutoShooting extends LinearOpMode {
     // Auton navigational parts
     double  alterDist, drive1, drive2, drive3, drive4, parkDrive;
     double  driveHeading1, driveHeading2;
@@ -215,74 +215,13 @@ public class StatesAutoBlueBase extends LinearOpMode {
             switch (stateController) {
 
                 case 0: {
-                    stateDescription = "Driving Forward"; displayState();
-                    gyroDriveStraight(drivePower, drive1, driveHeading1);
-                    stateController++; break;
-                }
-                case 1: {
                     stateDescription = "Shooting Particles"; displayState();
                     autonomousShootBall(shootingPower, shooterSpeed, 5, 1.6, 3, 1);
                     stateController++; break;
                 }
-                case 2: {
-                    stateDescription = "Turning Right"; displayState();
-                    gyroTurnLeft(turn1, turnPower, turnPower);
-                    stateController++; break;
-                }
-                case 3: {
-                    stateDescription = "Backing Up"; displayState();
-                    gyroDriveStraight(drivePowerR, drive2, driveHeading2);
-                    stateController++; break;
-                }
-                case 4: {
-                    stateDescription = "Backwards Left Pivot Turn"; displayState();
-                    reverseGyroPivotalTurnLeft(pTurn1, turnPower);
-                    stateController++; break;
-                }
-                case 5: {
-                    stateDescription = "Driving to Line"; displayState();
-                    driveToLine(lineDrivePower, lThreshold);
-                    stateController++; break;
-                }
-                case 6: {
-                    stateDescription = "Beacon is Targeting"; displayState();
-                    pushBeacon(ALLIANCES.BLUE_ALLIANCE, 1.5, 1.7);
-                    stateController++; break;
-                }
-                case 7: {
-                    stateDescription = "Driving to Next Line"; displayState();
-                    gyroDriveStraight(drivePower, drive3, drive3);
-                    stateController++; break;
-                }
-                case 8: {
-                    stateDescription = "Beacon is Targeting"; displayState();
-                    pushBeacon(ALLIANCES.BLUE_ALLIANCE, 1.5, 1.7);
-                    stateController++; break;
-                }
-                case 9: {
-                    stateDescription = "Backing Up Slightly"; displayState();
-                    gyroDriveStraight(drivePower, 4.5, 0);
-                    stateController++; break;
-                }
-                case 10: {
-                    stateDescription = "Turning Towards Cap Ball"; displayState();
-                    gyroPivotalTurnRight(45, turnPower);
-                    stateController++; break;
-                }
-                case 11: {
-                    stateDescription = "Proceeding To Push Cap Ball And Park"; displayState();
-                    gyroDriveStraight(drivePower, drive4, 45);
-                    stateController++; break;
-                }
-                case 12: {
-                    stateDescription = "Turning 180 Degrees"; displayState();
-                    gyroTurnLeft(180, turnPower, turnPower);
-                    stateController++; break;
-                }
-                case 13: {
-                    stateDescription = "Proceeding To Push Cap Ball And Park"; displayState();
-                    gyroDriveStraight(drivePower, parkDrive, 45);
-                    stateController++; break;
+                case 1: {
+                    stateDescription = "Proceeding To Knock Off Cap Ball and Park"; displayState();
+                    gyroDriveStraight(drivePower, 57, 0);
                 }
                 default: {
                     telemetry.addData("SUCCESS", "Hey! Dat's Pretty Gooood");
@@ -700,7 +639,6 @@ public class StatesAutoBlueBase extends LinearOpMode {
                 powerAdjustment = headingError * GYRO_DRIVE_MOTOR_MULTIPLIER;
 
                 //    leftMotor.setPower(speed + powerAdjustment);
-                rightMotor.setPower(Math.signum(driveInches) * (speed) - powerAdjustment);
                 rightMotor.setPower(Math.signum(driveInches) * (speed) - powerAdjustment);
                 rightMotorR.setPower(Math.signum(driveInches) * (speed) - powerAdjustment);
 

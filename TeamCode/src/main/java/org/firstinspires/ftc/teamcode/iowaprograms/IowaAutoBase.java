@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.iowaprograms;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.util.Range;
 /*
  * Created by the BFR Coderz on 11/26/2016.
  */
-public class AutonBase extends LinearOpMode {
+public class IowaAutoBase extends LinearOpMode {
     // Auton navigational parts
     double  alterDist, drive1, drive2, drive3, drive4, parkDrive, shootDrive;
     double  driveHeading1, driveHeading2, driveHeading3, driveHeadingBeacon;
@@ -62,7 +62,7 @@ public class AutonBase extends LinearOpMode {
     static final double FULL_TURN_CIRCUMFERENCE = 3.1415 * ROBOT_WIDTH * 2;
     static final double FULL_TURN_COUNTS = FULL_TURN_CIRCUMFERENCE * COUNTS_PER_INCH;
     static final double GYRO_DRIVE_MOTOR_MULTIPLIER = 0.002;
-    static final int GYRO_READING_COUNT = 10;
+    static final int GYRO_READING_COUNT = 3;
     static final double GYRO_READING_DELAY_FACTOR = 0.942;
     static final double GYRO_LINEAR_TURN_ANGLE = 150;
     static final double GYRO_ANTI_TURN_STALL_POWER = .32;
@@ -93,7 +93,7 @@ public class AutonBase extends LinearOpMode {
 
     // Declare sensors and timer
     OpticalDistanceSensor           lineSensor;
-    ModernRoboticsI2cGyro           gyro;
+    public ModernRoboticsI2cGyro           gyro;
     byte[] rangeCache;
     byte[] rangeCache2;
     byte[] colorBlue;
@@ -281,8 +281,16 @@ public class AutonBase extends LinearOpMode {
     //inches: should always be positive
     //targetHeading: global gyro heading
     public void driveForward(double power, double inches, int targetHeading, boolean rampDown) {
+
+        //Set motors to correct mode:
+        setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
         //Make sure the power is always positive for forward move
         power = power < 0 ? -power : power;
+        inches = inches < 0?  -inches : inches;
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
@@ -309,6 +317,8 @@ public class AutonBase extends LinearOpMode {
             double steeringFactor = 0.124;
             if (power > .6)
                 steeringFactor = 0.131;
+            if (power < .16)
+                steeringFactor = 0.031;
 
             double leftPower = power - steeringFactor;
             double rightPower = power + steeringFactor;
@@ -373,8 +383,15 @@ public class AutonBase extends LinearOpMode {
     //targetHeading: global gyro heading
     public void driveBackward(double power, double inches, int targetHeading, boolean rampDown)
     {
+
+        //Set motors to correct mode:
+        setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         //Make sure the power is always negative for backward move
         power = power < 0 ? power : -power;
+        inches = inches < 0?  -inches : inches;
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
@@ -391,6 +408,8 @@ public class AutonBase extends LinearOpMode {
 
             if (power < -.6)
                 steeringFactor = 0.1195;
+            if (power < .16)
+                steeringFactor = 0.031;
 
             double leftPower = power + steeringFactor;
             double rightPower = power - steeringFactor;
@@ -449,10 +468,11 @@ public class AutonBase extends LinearOpMode {
         leftMotorR.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotorR.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
-        setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
         setMotorsMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        idle();
         setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftShooterMotor  = hardwareMap.dcMotor.get("ls");
         rightShooterMotor = hardwareMap.dcMotor.get("rs");
@@ -891,22 +911,22 @@ public class AutonBase extends LinearOpMode {
             timeKeeper.reset();
             if (alliances == ALLIANCES.RED_ALLIANCE) {
                 if (getColor(colorRreader).equals("RED")) {
-                    gyroDriveStraight(0.15, alterDist, 0);
+                    driveBackward(0.15, alterDist, 0, false);
                     while (timeKeeper.time() < 1.9)
                         bTrigRed.setPosition(RED_PUSH);
                 } else if (getColor(colorRreader).equals("BLUE")) {
-                    encoderDrive(0.15, -alterDist2, 0);
+                    driveForward(0.15, alterDist2, 0, false);
                     while (timeKeeper.time() < 1.9)
                         bTrigRed.setPosition(RED_PUSH);
                 }
 
             } else {
                 if (getColor(colorRreader).equals("BLUE")) {
-                    gyroDriveStraight(0.15, -alterDist, -180);
+                    driveBackward(0.15, -alterDist, -180, false);
                     while (timeKeeper.time() < 1.9)
                         bTrigRed.setPosition(RED_PUSH);
                 } else if (getColor(colorRreader).equals("RED")) {
-                    gyroDriveStraight(0.15, alterDist2, -180);
+                    driveForward(0.15, alterDist2, -180, false);
                     while (timeKeeper.time() < 1.9)
                         bTrigRed.setPosition(RED_PUSH);
                 }
@@ -921,6 +941,10 @@ public class AutonBase extends LinearOpMode {
         }
     }
     public void driveToLine(double speed, double threshold) throws InterruptedException {
+
+        setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         while (lineSensor.getLightDetected() < threshold / 100) {
             setPowerLR(speed, speed);

@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.misc;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 /**
  * Created by Owner on 12/9/2016.
  */
-@Autonomous(name = "Auto Blue: [Right]weakrjhwaeiaaaaa", group = "Cyber Young Jr")
-public class NextToLineShooting extends StatesAutoShooting {
+@Autonomous(name = "Auto Blue: [Right]", group = "Cyber Young Jr")
+public class ABRight00 extends StatesAutoBlueBase {
     @Override
     public void setAuton() {
         shooterSpeed    = 7500   ;

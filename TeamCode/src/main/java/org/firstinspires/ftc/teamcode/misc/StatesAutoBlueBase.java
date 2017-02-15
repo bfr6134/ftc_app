@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.misc;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
@@ -19,16 +19,17 @@ import com.qualcomm.robotcore.util.Range;
 /*
  * Created by the BFR Coderz on 11/26/2016.
  */
-public class StatesAutoRedBase extends LinearOpMode {
+public class StatesAutoBlueBase extends LinearOpMode {
     // Auton navigational parts
-    double  drive1, drive2, parkDrive;
-    double  driveHeading1, driveHeading2, driveHeading3;
+    double  alterDist, drive1, drive2, drive3, drive4, parkDrive;
+    double  driveHeading1, driveHeading2;
     double  leftK, rightK;
-    double  drivePower, turnPower, lineDrivePower, shootingPower;
+    double  drivePower, drivePowerR, turnPower, lineDrivePower, shootingPower;
     double  lThreshold, optimalWallDist;
     double[] alterDistances = new double[2];
-    int     pTurn1, pTurn2, pTurn3;
+    double     pTurn1, pTurn2, pTurn3;
     int     shooterSpeed;
+    double     turn1;
     int     stateController = 0;
     String stateDescription;
 
@@ -63,10 +64,10 @@ public class StatesAutoRedBase extends LinearOpMode {
     static final double FULL_TURN_COUNTS = FULL_TURN_CIRCUMFERENCE * COUNTS_PER_INCH;
     static final double GYRO_DRIVE_MOTOR_MULTIPLIER = 0.0001;
     static final int GYRO_READING_COUNT = 10;
-    static final double GYRO_READING_DELAY_FACTOR = 0.929;
+    static final double GYRO_READING_DELAY_FACTOR = 0.942;
     static final double GYRO_LINEAR_TURN_ANGLE = 150;
-    static final double GYRO_ANTI_TURN_STALL_POWER = .24;
-
+    static final double GYRO_ANTI_TURN_STALL_POWER = .3;
+    
     // Declare servos
     Servo dropFork;
     Servo bTrigBlue;
@@ -214,65 +215,82 @@ public class StatesAutoRedBase extends LinearOpMode {
             switch (stateController) {
 
                 case 0: {
-                    stateDescription = "Shooting"; displayState();
-                    autonomousShootBall(shootingPower, shooterSpeed, 5, 0, 0, 2);
-                    stateController++; break;
-                }
-                case 1: {
-                    stateDescription = "Turning Left"; displayState();
-                    encoderLeftPTurn(turnPower, pTurn1, leftK);
-                    stateController++; break;
-                }
-
-                case 2: {
                     stateDescription = "Driving Forward"; displayState();
                     gyroDriveStraight(drivePower, drive1, driveHeading1);
                     stateController++; break;
                 }
-                case 3: {
+                case 1: {
+                    stateDescription = "Shooting Particles"; displayState();
+                    autonomousShootBall(shootingPower, shooterSpeed, 5, 1.6, 3, 1);
+                    stateController++; break;
+                }
+                case 2: {
                     stateDescription = "Turning Right"; displayState();
-                    gyroPivotalTurnRight(pTurn2, turnPower);
+                    gyroTurnLeft(turn1, turnPower, turnPower);
+                    stateController++; break;
+                }
+                case 3: {
+                    stateDescription = "Backing Up"; displayState();
+                    gyroDriveStraight(drivePowerR, drive2, driveHeading2);
                     stateController++; break;
                 }
                 case 4: {
+                    stateDescription = "Backwards Left Pivot Turn"; displayState();
+                    reverseGyroPivotalTurnLeft(pTurn1, turnPower);
+                    stateController++; break;
+                }
+                case 5: {
                     stateDescription = "Driving to Line"; displayState();
                     driveToLine(lineDrivePower, lThreshold);
                     stateController++; break;
                 }
-                case 5: {
-                    stateDescription = "Beacon is Targeting"; displayState();
-                    pushBeacon(ALLIANCES.RED_ALLIANCE, alterDistances[0], alterDistances[1]);
-                    stateController++; break;
-                }
-
                 case 6: {
-                    stateDescription = "Speeding for Set Distance"; displayState();
-                    gyroDriveStraight(drivePower, drive2, driveHeading2);
+                    stateDescription = "Beacon is Targeting"; displayState();
+                    pushBeacon(ALLIANCES.BLUE_ALLIANCE, 1.5, 1.7);
                     stateController++; break;
                 }
                 case 7: {
                     stateDescription = "Driving to Next Line"; displayState();
-                    driveToLine(lineDrivePower, lThreshold);
+                    gyroDriveStraight(drivePower, drive3, drive3);
                     stateController++; break;
                 }
                 case 8: {
                     stateDescription = "Beacon is Targeting"; displayState();
-                    pushBeacon(ALLIANCES.RED_ALLIANCE, alterDistances[0], alterDistances[1]);
+                    pushBeacon(ALLIANCES.BLUE_ALLIANCE, 1.5, 1.7);
                     stateController++; break;
                 }
                 case 9: {
-                    stateDescription = "Turning to Cap Ball"; displayState();
-                    reverseGyroPivotalTurnLeft(45, turnPower + 0.2);
+                    stateDescription = "Backing Up Slightly"; displayState();
+                    gyroDriveStraight(drivePower, 4.5, 0);
                     stateController++; break;
                 }
                 case 10: {
-                    stateDescription = "Knocking and Capping"; displayState();
-                    gyroDriveStraight(drivePower, parkDrive, driveHeading3);
+                    stateDescription = "Turning Towards Cap Ball"; displayState();
+                    gyroPivotalTurnRight(45, turnPower);
+                    stateController++; break;
+                }
+                case 11: {
+                    stateDescription = "Proceeding To Push Cap Ball And Park"; displayState();
+                    gyroDriveStraight(drivePower, drive4, 45);
+                    stateController++; break;
+                }
+                case 12: {
+                    stateDescription = "Turning 180 Degrees"; displayState();
+                    gyroTurnLeft(180, turnPower, turnPower);
+                    stateController++; break;
+                }
+                case 13: {
+                    stateDescription = "Proceeding To Push Cap Ball And Park"; displayState();
+                    gyroDriveStraight(drivePower, parkDrive, 45);
                     stateController++; break;
                 }
                 default: {
                     telemetry.addData("SUCCESS", "Hey! Dat's Pretty Gooood");
-                    telemetry.update(); break;
+                    leftMotor.setPower(0);
+                    leftMotorR.setPower(0);
+                    rightMotor.setPower(0);
+                    rightMotorR.setPower(0);
+                    break;
                 }
             }
             idle();
@@ -306,13 +324,13 @@ public class StatesAutoRedBase extends LinearOpMode {
         int newRightTarget;
 
         // Ensure that the opmode is still active
-        if (opModeIsActive()) {
+            if (opModeIsActive()) {
 
-            // Determine new target position, and pass to motor controller
-            newLeftTarget = leftMotor.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-            newRightTarget = rightMotor.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
-            leftMotor.setTargetPosition(newLeftTarget);
-            rightMotor.setTargetPosition(newRightTarget);
+                // Determine new target position, and pass to motor controller
+                newLeftTarget = leftMotor.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+                newRightTarget = rightMotor.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+                leftMotor.setTargetPosition(newLeftTarget);
+                rightMotor.setTargetPosition(newRightTarget);
 
             // Turn On RUN_TO_POSITION
             leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -321,10 +339,10 @@ public class StatesAutoRedBase extends LinearOpMode {
 
             setPowerLR(Math.abs(speed), Math.abs(speed));
 
-            if (leftInches < 0) {
-                leftMotorR.setPower(-speed);
-                rightMotorR.setPower(-speed);
-            }
+                if (leftInches < 0){
+                    leftMotorR.setPower(-speed);
+                    rightMotorR.setPower(-speed);
+                }
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             while (opModeIsActive() &&
@@ -338,91 +356,71 @@ public class StatesAutoRedBase extends LinearOpMode {
             // Turn off RUN_TO_POSITION
             leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            leftMotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            leftMotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
         }
     }
 
-    public void reverseGyroPivotalTurnRight(double degree, double power) throws InterruptedException {
-        //gyroTurnRight(degree, power, 0);
+    public void encoderRightPTurnR(double power, float degrees, double k) throws InterruptedException{
+        double dDecimal = degrees / 360;
+        double counts   = dDecimal * FULL_TURN_COUNTS;
 
-        leftMotorR.setPower(0);
-        leftMotor.setPower(0);
+        int newLeftTarget;
+        int newRightTarget;
+        int leftCurrent;
+        int rightCurrent;
 
-        double currentAngle = gyroReading();
-        double targetAngle = currentAngle + GYRO_READING_DELAY_FACTOR*degree;
+        double leftPower;
+        double rightPower;
 
-        double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
-        double error = targetAngle - currentAngle;
+        double distanceError;
 
-        while (opModeIsActive() && error > 0)
-        {
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
 
-            //  leftMotorR.setPower(0);
-            //  leftMotor.setPower(0);
+            // Determine new target position, and pass to motor controller
+            leftCurrent = leftMotor.getCurrentPosition();
+            rightCurrent = rightMotor.getCurrentPosition();
+            newLeftTarget = leftCurrent;
+            newRightTarget = (int) (rightCurrent - (counts));
+            newRightTarget  *= k;
+            leftMotor.setTargetPosition(newLeftTarget);
+            rightMotor.setTargetPosition(newRightTarget);
 
-            //   DbgLog.msg("Current Gyro Reading %7d", gyroReading());
-            //   DbgLog.msg("Current Turn Error %.02f", error);
+            rightMotor.setPower(Math.abs(power));
+            rightMotorR.setPower(Math.abs(power));
+            leftMotor.setPower(0);
+            leftMotorR.setPower(0);
 
-            double newRigtPower = Range.clip(power * Math.abs(error) / slowTurnAngle, 0, 1);
-            if (newRigtPower < .4)
-                newRigtPower = .4;
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            while (opModeIsActive() &&
+                (rightMotor.getCurrentPosition() > newRightTarget)) {
 
-            rightMotor.setPower(-newRigtPower);
-            rightMotorR.setPower(-newRigtPower);
+                distanceError = rightMotor.getCurrentPosition() - newRightTarget;
 
-            idle();
 
-            currentAngle = gyroReading();
-            error = targetAngle - currentAngle;
+                if (distanceError >= 1100) {
+                    rightMotor.setPower(0.5);
+                    rightMotorR.setPower(0.5);
+                }
+                idle();
+            }
+
+            // Stop all motion;
+            leftMotor.setPower(0);
+            leftMotorR.setPower(0);
+            rightMotor.setPower(0);
+            rightMotorR.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            /*  leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
+
+            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            leftMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-        leftMotorR.setPower(0);
-        rightMotorR.setPower(0);
-    }
-
-
-
-    public void reverseGyroPivotalTurnLeft(double degree, double power) throws InterruptedException {
-        rightMotorR.setPower(0);
-        rightMotor.setPower(0);
-
-        double currentAngle = gyroReading();
-        double targetAngle = currentAngle - GYRO_READING_DELAY_FACTOR*degree;
-
-        double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
-        double error = targetAngle - currentAngle;
-
-        while (opModeIsActive() && error < 0)
-        {
-
-            //   rightMotorR.setPower(0);
-            //   rightMotor.setPower(0);
-
-            //   DbgLog.msg("Current Gyro Reading %7d", gyroReading());
-            //   DbgLog.msg("Current Turn Error %.02f", error);
-
-            double newLeftPower = Range.clip(power * Math.abs(error) / slowTurnAngle, 0, 1);
-            if (newLeftPower < .4)
-                newLeftPower = .4;
-
-            leftMotor.setPower(-newLeftPower);
-            leftMotorR.setPower(-newLeftPower);
-
-            idle();
-
-            currentAngle = gyroReading();
-            error = targetAngle - currentAngle;
-        }
-
-        leftMotor.setPower(0);
-        rightMotor.setPower(0);
-        leftMotorR.setPower(0);
-        rightMotorR.setPower(0);
     }
 
     public void encoderLeftPTurn(double power, float degrees, double k) throws InterruptedException{
@@ -487,7 +485,69 @@ public class StatesAutoRedBase extends LinearOpMode {
         }
     }
 
-    public void encoderRightPTurn(double power, float degrees, double k) throws InterruptedException{
+    public void encoderLeftPTurnR(double power, float degrees, double k) throws InterruptedException{
+        double dDecimal = degrees / 360;
+        double counts   = dDecimal * FULL_TURN_COUNTS;
+
+        int newLeftTarget;
+        int newRightTarget;
+        int leftCurrent;
+        int rightCurrent;
+
+        double leftPower;
+        double rightPower;
+
+        double distanceError;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            leftCurrent = leftMotor.getCurrentPosition();
+            rightCurrent = rightMotor.getCurrentPosition();
+            newRightTarget = leftCurrent;
+            newLeftTarget = (int) (rightCurrent - (counts));
+            newLeftTarget  *= k;
+            leftMotor.setTargetPosition(newLeftTarget);
+            rightMotor.setTargetPosition(newRightTarget);
+
+            leftMotor.setPower(Math.abs(power));
+            leftMotorR.setPower(Math.abs(power));
+            rightMotor.setPower(0);
+            rightMotorR.setPower(0);
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            while (opModeIsActive() &&
+                    (leftMotor.getCurrentPosition() > newLeftTarget)) {
+
+                distanceError = leftMotor.getCurrentPosition() - newLeftTarget;
+
+
+                if (distanceError >= 1100) {
+                    leftMotor.setPower(0.5);
+                    leftMotorR.setPower(0.5);
+                }
+                idle();
+            }
+
+            // Stop all motion;
+            leftMotor.setPower(0);
+            leftMotorR.setPower(0);
+            rightMotor.setPower(0);
+            rightMotorR.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            /*  leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
+
+            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            leftMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+    }
+
+    public void encoderRightPTurn(double power, double degrees, double k) throws InterruptedException{
         double dDecimal = degrees / 360;
         double counts   = dDecimal * FULL_TURN_COUNTS;
 
@@ -564,26 +624,24 @@ public class StatesAutoRedBase extends LinearOpMode {
             timeKeeper.reset();
             if (alliances == ALLIANCES.RED_ALLIANCE) {
                 if (getColor(colorRreader).equals("RED")) {
-                  //  encoderDrive(drivePower, -alterDist, -alterDist);
-                    gyroDriveStraight(drivePower, -alterDist, 0);
+                    gyroDriveStraight(drivePower, alterDist, 0);
                     while (timeKeeper.time() < 1.9)
                         bTrigRed.setPosition(RED_PUSH);
                 } else if (getColor(colorRreader).equals("BLUE")) {
-                  //  encoderDrive(drivePower, alterDist2, alterDist2);
-                    gyroDriveStraight(drivePower, alterDist2, 0);
+                    encoderDrive(drivePower, -alterDist2, 0);
                     while (timeKeeper.time() < 1.9)
                         bTrigRed.setPosition(RED_PUSH);
                 }
 
             } else {
                 if (getColor(colorRreader).equals("BLUE")) {
-                    encoderDrive(drivePower, -alterDist, -alterDist);
+                    gyroDriveStraight(drivePower, -alterDist, 0);
                     while (timeKeeper.time() < 1.9)
-                        bTrigBlue.setPosition(BLUE_PUSH);
+                        bTrigRed.setPosition(RED_PUSH);
                 } else if (getColor(colorRreader).equals("RED")) {
-                    encoderDrive(drivePower, alterDist, alterDist);
+                    gyroDriveStraight(drivePower, alterDist2, 0);
                     while (timeKeeper.time() < 1.9)
-                        bTrigBlue.setPosition(BLUE_PUSH);
+                        bTrigRed.setPosition(RED_PUSH);
                 }
             }
 
@@ -594,11 +652,9 @@ public class StatesAutoRedBase extends LinearOpMode {
             bTrigRed.setPosition(RED_HOME);
             bTrigBlue.setPosition(BLUE_HOME);
         }
-        sleep(250);
     }
     public void driveToLine(double speed, double threshold) throws InterruptedException {
 
-        //  /setPowerLR(speed, speed);
         while (lineSensor.getLightDetected() < threshold / 100) {
             setPowerLR(speed, speed);
             idle();
@@ -611,7 +667,7 @@ public class StatesAutoRedBase extends LinearOpMode {
         int leftCurrent;
         int rightCurrent;
         double currentHeading;
-      //  boolean distanceFlag = true;
+      //  boolean distanceFlag = false;
         double headingError;
         double powerAdjustment = 0;
 
@@ -633,7 +689,6 @@ public class StatesAutoRedBase extends LinearOpMode {
             leftMotorR.setPower(Math.signum(driveInches) * speed);
             rightMotorR.setPower(Math.signum(driveInches) * speed);
 
-
             // keep looping while we are still active, and there is time left, and both motors are running.
             while (opModeIsActive()) {
 
@@ -644,33 +699,26 @@ public class StatesAutoRedBase extends LinearOpMode {
                 headingError = targetHeading - currentHeading;
                 powerAdjustment = headingError * GYRO_DRIVE_MOTOR_MULTIPLIER;
 
-                //leftMotorR.setPower(speed + powerAdjustment);
-                //leftMotor.setPower(speed + powerAdjustment);
-                rightMotor.setPower(Math.signum(driveInches) * speed - powerAdjustment);
-                rightMotorR.setPower(Math.signum(driveInches) * speed - powerAdjustment);
+                //    leftMotor.setPower(speed + powerAdjustment);
+                rightMotor.setPower(Math.signum(driveInches) * (speed) - powerAdjustment);
+                rightMotor.setPower(Math.signum(driveInches) * (speed) - powerAdjustment);
+                rightMotorR.setPower(Math.signum(driveInches) * (speed) - powerAdjustment);
 
-/*
-                leftMotor.setPower(speed);
-                rightMotor.setPower(speed);
-                leftMotorR.setPower(speed);
-                rightMotorR.setPower(speed);
-*/
-
-                if(driveInches > 0) {
-                    if (leftCurrent >= newLeftTarget) {
+                if (driveInches > 0) {
+                    if (leftCurrent >= newLeftTarget || rightCurrent >= newRightTarget) {
                         break;
                     }
                 }
                 else
                 {
-                    if (leftCurrent <= newLeftTarget) {
+                    if (leftCurrent <= newLeftTarget || rightCurrent <= newRightTarget) {
                         break;
                     }
                 }
 
-                //DbgLog.msg("GYRO - Current Heading %7d", gyro.getIntegratedZValue());
-                //DbgLog.msg("GYRO - Current Heading Error %.02f", headingError);
-                //DbgLog.msg("GYRO - Current Power Adjustment %.02f", powerAdjustment);
+                DbgLog.msg("GYRO - Current Heading %7d", gyro.getIntegratedZValue());
+                DbgLog.msg("GYRO - Current Heading Error %.02f", headingError);
+                DbgLog.msg("GYRO - Current Power Adjustment %.02f", powerAdjustment);
 
                 idle();
             }
@@ -698,7 +746,7 @@ public class StatesAutoRedBase extends LinearOpMode {
     double gyroReading() throws InterruptedException
     {
         double gRead = 0;
-        for (int i = 0; i < GYRO_READING_COUNT /*&& i%3==0*/;  i++) {
+        for (int i = 0; i < GYRO_READING_COUNT; i++) {
             gRead += gyro.getIntegratedZValue();
         }
 
@@ -814,6 +862,86 @@ public class StatesAutoRedBase extends LinearOpMode {
 
             leftMotor.setPower(newLeftPower);
             leftMotorR.setPower(newLeftPower);
+
+            idle();
+
+            currentAngle = gyroReading();
+            error = targetAngle - currentAngle;
+        }
+
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        leftMotorR.setPower(0);
+        rightMotorR.setPower(0);
+    }
+
+    public void reverseGyroPivotalTurnRight(double degree, double power) throws InterruptedException {
+        //gyroTurnRight(degree, power, 0);
+
+        leftMotorR.setPower(0);
+        leftMotor.setPower(0);
+
+        double currentAngle = gyroReading();
+        double targetAngle = currentAngle + GYRO_READING_DELAY_FACTOR*degree;
+
+        double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
+        double error = targetAngle - currentAngle;
+
+        while (opModeIsActive() && error > 0)
+        {
+
+          //  leftMotorR.setPower(0);
+          //  leftMotor.setPower(0);
+
+            //   DbgLog.msg("Current Gyro Reading %7d", gyroReading());
+            //   DbgLog.msg("Current Turn Error %.02f", error);
+
+            double newRigtPower = Range.clip(power * Math.abs(error) / slowTurnAngle, 0, 1);
+            if (newRigtPower < GYRO_ANTI_TURN_STALL_POWER)
+                newRigtPower = GYRO_ANTI_TURN_STALL_POWER;
+
+            rightMotor.setPower(-newRigtPower);
+            rightMotorR.setPower(-newRigtPower);
+
+            idle();
+
+            currentAngle = gyroReading();
+            error = targetAngle - currentAngle;
+        }
+
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        leftMotorR.setPower(0);
+        rightMotorR.setPower(0);
+    }
+
+
+
+    public void reverseGyroPivotalTurnLeft(double degree, double power) throws InterruptedException {
+        rightMotorR.setPower(0);
+        rightMotor.setPower(0);
+
+        double currentAngle = gyroReading();
+        double targetAngle = currentAngle - GYRO_READING_DELAY_FACTOR*degree;
+
+        double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
+        double error = targetAngle - currentAngle;
+
+        while (opModeIsActive() && error < 0)
+        {
+
+         //   rightMotorR.setPower(0);
+         //   rightMotor.setPower(0);
+
+            //   DbgLog.msg("Current Gyro Reading %7d", gyroReading());
+            //   DbgLog.msg("Current Turn Error %.02f", error);
+
+            double newLeftPower = Range.clip(power * Math.abs(error) / slowTurnAngle, 0, 1);
+            if (newLeftPower < GYRO_ANTI_TURN_STALL_POWER)
+                newLeftPower = GYRO_ANTI_TURN_STALL_POWER;
+
+            leftMotor.setPower(-newLeftPower);
+            leftMotorR.setPower(-newLeftPower);
 
             idle();
 

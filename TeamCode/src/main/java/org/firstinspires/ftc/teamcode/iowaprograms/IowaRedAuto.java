@@ -1,12 +1,14 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.iowaprograms;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
-/**
- * Created by jimly2024 on 2/8/2017.
+/*
+ * Created by Black Frog Coders on 2/8/2017.
  */
 @Autonomous (name = "Red Alliance [] Auto", group = "Autonomous")
-public class RedAuton extends AutonBase {
+// @Disabled
+public class IowaRedAuto extends IowaAutoBase {
 
     @Override
     public void setAuton() {
@@ -17,8 +19,8 @@ public class RedAuton extends AutonBase {
         drive1 = 52 - 3;
         drive2 = 33 - 6;
         parkDrive = -66;
-        pTurn1 = 58;
-        pTurn2 = 52 + 2;
+        pTurn1 = 58-4;
+        pTurn2 = 52+2;
         pTurn3 = 50;
         leftK = 0.96;
         rightK = 0.70;
@@ -36,6 +38,19 @@ public class RedAuton extends AutonBase {
         alterDistances[2] = -8;
     }
 
+    @Override
+    public void driveToLine(double speed, double threshold) throws InterruptedException {
+
+        setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        while (lineSensor.getLightDetected() < threshold / 100) {
+            setPowerLR(0.24, 0.36);
+            idle();
+        }
+        setPowerLR(0, 0);
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
