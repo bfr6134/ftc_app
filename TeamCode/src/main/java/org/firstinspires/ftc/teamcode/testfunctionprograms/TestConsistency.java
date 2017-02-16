@@ -14,7 +14,7 @@ public class TestConsistency extends IowaAutoBase {
     public void runOpMode() throws InterruptedException {
         initialization(); waitForStart();
 
-        gyroPivotalTurnRight(200, 0.6);
+        gyroPivotalTurnRight(2, 0.6);
 
         telemetry.addData("Gyro Heading", gyro.getIntegratedZValue());
         telemetry.update();

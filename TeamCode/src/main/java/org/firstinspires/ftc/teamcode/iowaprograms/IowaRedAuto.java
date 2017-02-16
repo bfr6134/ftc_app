@@ -10,32 +10,46 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 // @Disabled
 public class IowaRedAuto extends IowaAutoBase {
 
+    int latencyTurnFactor = 5;
+    double backUpPower = 0.2  ;
+
     @Override
     public void setAuton() {
-        shooterSpeed = 8250;
-        shootingPower = 0.9;
-        shootDrivePower = 0.3;
-        shootDrive = 1;
-        drive1 = 52 - 3;
-        drive2 = 33 - 6;
-        parkDrive = -66;
-        pTurn1 = 58-4;
-        pTurn2 = 52+2;
-        pTurn3 = 50;
-        leftK = 0.96;
-        rightK = 0.70;
-        optimalWallDist = 3.5;
-        lThreshold = 40;
-        driveHeading1 = -58;
-        driveHeading2 = 0 + 10 + 5;
-        driveHeading3 = -50;
-        drivePower = 0.60;
-        lineDrivePower = 0.2 + 0.1;
-        turnPower = 0.6;
-        mTurnPower = 0.45;
+
+
+        /* General unmodified auto measurements */
+        shooterSpeed    = 8250  ;
+        shootingPower   = 0.9   ;
+        shootDrivePower = 0.3   ;
+        shootDrive      = 1     ;
+        drive1          = 45+8-3;
+        drive2          = 37    ;
+        parkDrive       = -66   ;
+        pTurn1          = 55    ;
+
+        // Gyro error corrector turns
+        pTurn2   = 58-latencyTurnFactor ;
+        pTurn3   = 50-latencyTurnFactor ;
+
+        /* Properties of motion and sensing variables */
+
+        leftK           = 0.96 ;
+        rightK          = 0.70 ;
+        optimalWallDist = 3.5  ;
+        lThreshold      = 40   ;
+        driveHeading1   = -58  ;
+        driveHeading2   = 15   ;
+        driveHeading3   = -45  ;
+        drivePower      = 0.60 ;
+        lineDrivePower  = 0.3  ;
+        turnPower       = 0.6  ;
+        mTurnPower      = 0.45 ;
+
+
+        // For beacon pushing
         alterDistances[0] = 1.5;
         alterDistances[1] = 1.7;
-        alterDistances[2] = -8;
+        alterDistances[2] = -8 ;
     }
 
     @Override
@@ -74,12 +88,12 @@ public class IowaRedAuto extends IowaAutoBase {
             gyroPivotalTurnLeft(preManeuverDegrees, mTurnPower);
 
         if(preManeuverDegrees != 0)
-            gyroPivotalTurnRight(preManeuverDegrees*0.75, mTurnPower);
+            gyroPivotalTurnRight(preManeuverDegrees*0.7, mTurnPower);
 
         if (preManeuverDegrees != 0)
         {
             double backDistance = ROBOT_WIDTH*Math.sin(preManeuverDegrees*Math.PI/180);
-            driveBackward(lineDrivePower, -backDistance, (int) driveHeading2, true);
+            driveBackward(backUpPower, -backDistance, (int) driveHeading2, true);
         }
 
         driveToLine(lineDrivePower, lThreshold);
