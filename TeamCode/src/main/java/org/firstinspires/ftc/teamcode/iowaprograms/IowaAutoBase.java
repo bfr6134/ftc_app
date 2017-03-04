@@ -30,6 +30,8 @@ public class IowaAutoBase extends LinearOpMode {
     double     pTurn1, pTurn2, pTurn3;
     int     shooterSpeed;
     double     turn1;
+    double rightLatencyFac;
+    double leftLatencyFac;
     int     stateController = 0;
     double  preManeuverDegrees, preManeuverDegrees2;
     String stateDescription;
@@ -46,7 +48,7 @@ public class IowaAutoBase extends LinearOpMode {
     DcMotor rightMotorR;
 
     DcMotor leftShooterMotor;
-    DcMotor rightShooterMotor;
+    public DcMotor rightShooterMotor;
 
     DcMotor intakeMotor;
 
@@ -64,8 +66,8 @@ public class IowaAutoBase extends LinearOpMode {
     static final double GYRO_DRIVE_MOTOR_MULTIPLIER = 0.002;
     static final int GYRO_READING_COUNT = 3;
     static final double GYRO_READING_DELAY_FACTOR = 0.942;
-    static final double GYRO_LINEAR_TURN_ANGLE = 150;
-    static final double GYRO_ANTI_TURN_STALL_POWER = .32;
+    static final double GYRO_LINEAR_TURN_ANGLE = 20; //Was 150 deg, 30
+    static final double GYRO_ANTI_TURN_STALL_POWER = .45;
 
     static final double MAXIMUM_CORRECTION_DISTANCE = 4;
     
@@ -585,9 +587,9 @@ public class IowaAutoBase extends LinearOpMode {
         alterDistances[2] = 8    ;*/
     }
 
-    public void runAuton(){
+    /*public void runAuton(){
 
-    }
+    }*/
 
     public void setPowerLR(double left, double right) throws InterruptedException {
         leftMotor.setPower(left);
@@ -1054,7 +1056,7 @@ public class IowaAutoBase extends LinearOpMode {
     public void gyroTurnRight(double degree, double leftPower, double rightPower) throws InterruptedException {
 
         double currentAngle = gyroReading();
-        double targetAngle = currentAngle + GYRO_READING_DELAY_FACTOR*degree;
+        double targetAngle = currentAngle + degree;
 
         double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
         double error = targetAngle - currentAngle;
@@ -1095,7 +1097,7 @@ public class IowaAutoBase extends LinearOpMode {
         leftMotor.setPower(0);
 
         double currentAngle = gyroReading();
-        double targetAngle = currentAngle - GYRO_READING_DELAY_FACTOR*degree;
+        double targetAngle = currentAngle - degree;
 
         double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
         double error = targetAngle - currentAngle;
@@ -1135,7 +1137,7 @@ public class IowaAutoBase extends LinearOpMode {
         rightMotor.setPower(0);
 
         double currentAngle = gyroReading();
-        double targetAngle = currentAngle + GYRO_READING_DELAY_FACTOR*degree;
+        double targetAngle = currentAngle + degree;
 
         double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
         double error = targetAngle - currentAngle;
@@ -1175,7 +1177,7 @@ public class IowaAutoBase extends LinearOpMode {
         leftMotor.setPower(0);
 
         double currentAngle = gyroReading();
-        double targetAngle = currentAngle + GYRO_READING_DELAY_FACTOR*degree;
+        double targetAngle = currentAngle + degree;
 
         double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
         double error = targetAngle - currentAngle;
@@ -1215,7 +1217,7 @@ public class IowaAutoBase extends LinearOpMode {
         rightMotor.setPower(0);
 
         double currentAngle = gyroReading();
-        double targetAngle = currentAngle - GYRO_READING_DELAY_FACTOR*degree;
+        double targetAngle = currentAngle - degree;
 
         double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
         double error = targetAngle - currentAngle;
@@ -1255,7 +1257,7 @@ public class IowaAutoBase extends LinearOpMode {
     public void gyroTurnLeft(double degree, double leftPower, double rightPower) throws InterruptedException {
 
         double currentAngle = gyroReading();
-        double targetAngle = currentAngle - GYRO_READING_DELAY_FACTOR*degree;
+        double targetAngle = currentAngle - degree;
 
         double slowTurnAngle = GYRO_LINEAR_TURN_ANGLE;
         double error = targetAngle - currentAngle;

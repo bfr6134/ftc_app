@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.iowaprograms;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -25,22 +26,24 @@ public class IowaRedAuto extends IowaAutoBase {
         drive1          = 45+8-3;
         drive2          = 37    ;
         parkDrive       = -66   ;
-        pTurn1          = 55    ;
 
         // Gyro error corrector turns
-        pTurn2   = 58-latencyTurnFactor ;
+        pTurn1   = 45-latencyTurnFactor ;
+        pTurn2   = 45-latencyTurnFactor ;
         pTurn3   = 50-latencyTurnFactor ;
 
         /* Properties of motion and sensing variables */
 
         leftK           = 0.96 ;
         rightK          = 0.70 ;
+        rightLatencyFac = 10   ;
+        leftLatencyFac  = 6    ;
         optimalWallDist = 3.5  ;
         lThreshold      = 40   ;
         driveHeading1   = -58  ;
         driveHeading2   = 15   ;
         driveHeading3   = -45  ;
-        drivePower      = 0.60 ;
+        drivePower      = 0.6  ;
         lineDrivePower  = 0.3  ;
         turnPower       = 0.6  ;
         mTurnPower      = 0.45 ;
@@ -77,7 +80,8 @@ public class IowaRedAuto extends IowaAutoBase {
 
         autonomousShootBall(shootingPower, shooterSpeed, 5, 0, 0, 2);
 
-        encoderLeftPTurn(turnPower, (int) pTurn1, leftK);
+        // encoderLeftPTurn(turnPower, (int) pTurn1, leftK);
+        gyroPivotalTurnLeft(pTurn1, turnPower);
 
         driveForward(drivePower, drive1, (int) driveHeading1, true);
 
